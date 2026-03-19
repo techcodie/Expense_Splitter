@@ -1,0 +1,20 @@
+{
+  "name": "peerflow-server",
+  "version": "0.1.0",
+  "description": "PeerFlow backend – Peer-to-Peer Expense Splitter",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2",
+    "dotenv": "^16.4.7",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
