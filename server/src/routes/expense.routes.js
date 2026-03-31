@@ -9,7 +9,8 @@ router.use(protect);
 // POST /api/expenses — add new expense
 router.post('/', addExpense);
 
-// GET /api/groups/:groupId/expenses — handled via group-scoped route
-// (mounted separately in app.js)
+// POST /api/expenses/:expenseId/vote
+const { voteOnExpense } = require('../controllers/expense.controller');
+router.post('/:expenseId/vote', voteOnExpense);
 
 module.exports = router;
