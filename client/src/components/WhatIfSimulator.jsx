@@ -124,13 +124,13 @@ export default function WhatIfSimulator({ balances, members }) {
         <div className="flex gap-2">
           <button
             onClick={reset}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
           >
             <RotateCcw size={12} /> Reset
           </button>
           <button
             onClick={() => { setEnabled(false); reset(); }}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
           >
             Close
           </button>
@@ -221,7 +221,7 @@ export default function WhatIfSimulator({ balances, members }) {
               <div key={i} className="flex items-center justify-between text-xs p-2 rounded-lg bg-gray-100 dark:bg-gray-800/50">
                 <span>
                   <span className="text-red-500 dark:text-red-400">{edge.fromName}</span>
-                  <span className="text-gray-400 dark:text-gray-500"> → </span>
+                  <span className="text-gray-500 dark:text-gray-400"> → </span>
                   <span className="text-green-600 dark:text-green-400">{edge.toName}</span>
                 </span>
                 <span className="font-mono text-purple-600 dark:text-purple-300">{formatCurrency(edge.amount)}</span>

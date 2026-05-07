@@ -15,7 +15,7 @@ const COLORS = {
   orange: {
     stroke: '#f97316',
     strokeLight: 'rgba(249, 115, 22, 0.25)',
-    fill: '#fb923c',
+    fill: '#10b981',
     arrow: '#f97316',
     glow: 'rgba(249, 115, 22, 0.12)',
   },
@@ -53,18 +53,11 @@ export default function DebtGraph({ nodes: memberNodes, edges, colorTheme = 'ora
     if (!edges || edges.length === 0) {
       svg.append('text')
         .attr('x', width / 2)
-        .attr('y', height / 2 - 10)
-        .attr('text-anchor', 'middle')
-        .attr('fill', '#4b5563')
-        .attr('font-size', '32px')
-        .text('✓');
-      svg.append('text')
-        .attr('x', width / 2)
-        .attr('y', height / 2 + 20)
+        .attr('y', height / 2)
         .attr('text-anchor', 'middle')
         .attr('fill', '#6b7280')
-        .attr('font-size', '13px')
-        .text('No debts');
+        .attr('font-size', '14px')
+        .text('No debts to display');
       return;
     }
 

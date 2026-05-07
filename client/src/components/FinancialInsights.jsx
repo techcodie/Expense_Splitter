@@ -33,11 +33,11 @@ function StatCard({ icon: Icon, label, value, color = 'primary', subtext }) {
     <div className={`relative overflow-hidden rounded-2xl border bg-gradient-to-br p-5 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${colorMap[color]}`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">{label}</p>
+          <p className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">{label}</p>
           <p className={`text-2xl font-bold ${textColorMap[color]}`}>
             {value}
           </p>
-          {subtext && <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{subtext}</p>}
+          {subtext && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtext}</p>}
         </div>
         <div className={`p-2.5 rounded-xl bg-white/30 dark:bg-white/5 ${textColorMap[color]}`}>
           <Icon size={20} />
