@@ -1,6 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import toast from 'react-hot-toast';
+import { Scale, Pencil } from 'lucide-react';
 import api from '../api/axios';
 import { rupeesToPaise, formatCurrency } from '../utils/money';
 
@@ -10,7 +14,7 @@ function AddExpense() {
 
   const [group, setGroup] = useState(null);
   const [apiError, setApiError] = useState('');
-  const [splitType, setSplitType] = useState('equal'); // 'equal' | 'custom'
+  const [splitType, setSplitType] = useState('equal');
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [customShares, setCustomShares] = useState({});
   const [loading, setLoading] = useState(true);
@@ -21,7 +25,6 @@ function AddExpense() {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  // Fetch group details for member list
   useEffect(() => {
     const fetchGroup = async () => {
       try {
@@ -29,7 +32,6 @@ function AddExpense() {
         const found = res.data.data.groups.find((g) => g._id === groupId);
         if (found) {
           setGroup(found);
-          // Select all members by default
           setSelectedMembers(found.members.map((m) => m._id));
         }
       } catch (err) {
@@ -81,7 +83,6 @@ function AddExpense() {
         payload.equalSplit = true;
         payload.splitUsers = selectedMembers;
       } else {
-        // Custom split
         const splits = selectedMembers.map((uid) => ({
           user: uid,
           shareAmount: rupeesToPaise(customShares[uid] || 0),
@@ -100,16 +101,20 @@ function AddExpense() {
       }
 
       await api.post('/expenses', payload);
+      confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ['#14b8a6', '#10b981', '#fbbf24'] });
+      toast.success('Expense added!');
       navigate(`/groups/${groupId}`);
     } catch (err) {
-      setApiError(err.response?.data?.error || 'Failed to add expense.');
+      const msg = err.response?.data?.error || 'Failed to add expense.';
+      setApiError(msg);
+      toast.error(msg);
     }
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
-        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -117,7 +122,7 @@ function AddExpense() {
   if (!group) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-10 text-center">
-        <p className="text-red-400">Group not found.</p>
+        <p className="text-red-500">Group not found.</p>
       </div>
     );
   }
@@ -126,22 +131,34 @@ function AddExpense() {
     <div className="max-w-2xl mx-auto px-4 py-10">
       <button
         onClick={() => navigate(-1)}
-        className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm mb-6 flex items-center gap-1 transition-colors"
+        className="text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 text-sm mb-6 flex items-center gap-1 transition-colors"
       >
         ← Back
       </button>
 
-      <div className="card">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="card"
+      >
         <h2 className="text-2xl font-bold mb-1">Add Expense</h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
-          to <span className="text-primary-600 dark:text-primary-300 font-semibold">{group.name}</span>
+        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
+          to <span className="text-teal-600 dark:text-teal-300 font-semibold">{group.name}</span>
         </p>
 
-        {apiError && (
-          <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm">
-            {apiError}
-          </div>
-        )}
+        <AnimatePresence>
+          {apiError && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginBottom: 16 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+              className="p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm overflow-hidden"
+            >
+              {apiError}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Description */}
@@ -157,7 +174,7 @@ function AddExpense() {
               {...register('description', { required: 'Description is required' })}
             />
             {errors.description && (
-              <p className="mt-1 text-xs text-red-400">{errors.description.message}</p>
+              <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>
             )}
           </div>
 
@@ -182,7 +199,7 @@ function AddExpense() {
               />
             </div>
             {errors.totalAmount && (
-              <p className="mt-1 text-xs text-red-400">{errors.totalAmount.message}</p>
+              <p className="mt-1 text-xs text-red-500">{errors.totalAmount.message}</p>
             )}
           </div>
 
@@ -204,26 +221,37 @@ function AddExpense() {
               ))}
             </select>
             {errors.paidBy && (
-              <p className="mt-1 text-xs text-red-400">{errors.paidBy.message}</p>
+              <p className="mt-1 text-xs text-red-500">{errors.paidBy.message}</p>
             )}
           </div>
 
-          {/* Split Type Toggle */}
+          {/* Split Type Toggle with animated indicator */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Split Type</label>
-            <div className="flex gap-2">
-              {['equal', 'custom'].map((type) => (
+            <div className="inline-flex bg-gray-100 dark:bg-gray-800/60 p-1 rounded-xl border border-gray-200 dark:border-gray-700/50">
+              {[
+                { key: 'equal', label: 'Equal', icon: Scale },
+                { key: 'custom', label: 'Custom', icon: Pencil },
+              ].map((opt) => (
                 <button
-                  key={type}
+                  key={opt.key}
                   type="button"
-                  onClick={() => setSplitType(type)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    splitType === type
-                      ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/25'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  onClick={() => setSplitType(opt.key)}
+                  className={`relative inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    splitType === opt.key
+                      ? 'text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
                   }`}
                 >
-                  {type === 'equal' ? '⚖️ Equal' : '✏️ Custom'}
+                  {splitType === opt.key && (
+                    <motion.span
+                      layoutId="split-pill"
+                      className="absolute inset-0 rounded-lg bg-teal-600 -z-10"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <opt.icon size={14} />
+                  {opt.label}
                 </button>
               ))}
             </div>
@@ -242,25 +270,33 @@ function AddExpense() {
                       type="checkbox"
                       checked={selectedMembers.includes(m._id)}
                       onChange={() => toggleMember(m._id)}
-                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500 bg-white dark:bg-gray-800"
+                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-teal-600 focus:ring-teal-500 bg-white dark:bg-gray-800"
                     />
-                    <span className="text-sm text-gray-800 dark:text-gray-200">{m.name}</span>
+                    <span className="text-sm text-gray-900 dark:text-gray-50">{m.name}</span>
                   </label>
 
-                  {splitType === 'custom' && selectedMembers.includes(m._id) && (
-                    <div className="relative w-32">
-                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs">₹</span>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        value={customShares[m._id] || ''}
-                        onChange={(e) => handleCustomShareChange(m._id, e.target.value)}
-                        className="input-field !py-1.5 !text-sm pl-6 w-full"
-                      />
-                    </div>
-                  )}
+                  <AnimatePresence>
+                    {splitType === 'custom' && selectedMembers.includes(m._id) && (
+                      <motion.div
+                        initial={{ opacity: 0, width: 0 }}
+                        animate={{ opacity: 1, width: 128 }}
+                        exit={{ opacity: 0, width: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="relative overflow-hidden"
+                      >
+                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs z-10">₹</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={customShares[m._id] || ''}
+                          onChange={(e) => handleCustomShareChange(m._id, e.target.value)}
+                          className="input-field !py-1.5 !text-sm pl-6 w-32"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ))}
             </div>
@@ -271,7 +307,7 @@ function AddExpense() {
             <input
               type="checkbox"
               id="exp-recurring"
-              className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500 bg-white dark:bg-gray-800"
+              className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-teal-600 focus:ring-teal-500 bg-white dark:bg-gray-800"
               {...register('isRecurring')}
             />
             <label htmlFor="exp-recurring" className="text-sm text-gray-700 dark:text-gray-300">
@@ -279,12 +315,9 @@ function AddExpense() {
             </label>
           </div>
 
-          {/* Frequency (shown if recurring) */}
+          {/* Frequency */}
           <div>
-            <select
-              className="input-field"
-              {...register('frequency')}
-            >
+            <select className="input-field" {...register('frequency')}>
               <option value="">Select frequency</option>
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
@@ -293,11 +326,7 @@ function AddExpense() {
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="btn-primary w-full disabled:opacity-50"
-          >
+          <button type="submit" disabled={isSubmitting} className="btn-primary w-full disabled:opacity-50">
             {isSubmitting ? (
               <span className="flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -308,7 +337,7 @@ function AddExpense() {
             )}
           </button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }
